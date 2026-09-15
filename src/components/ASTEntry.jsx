@@ -12,6 +12,7 @@ const ASTEntry = () => {
 
   const organisms = getOrganisms();
   const antibiotics = currentResult.organism ? getAntibiotics(currentResult.organism) : [];
+  const isMicOnly = currentResult.interpretation === 'MIC';
 
   const handleChange = (field, value) => {
     setCurrentResult(field, value);
@@ -32,10 +33,18 @@ const ASTEntry = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validation
-    if (!currentResult.organism || !currentResult.antibiotic || !currentResult.zone) {
-      setMessage({ type: 'error', text: 'Please fill in organism, antibiotic, and zone diameter' });
+    if (!currentResult.organism || !currentResult.antibiotic) {
+      setMessage({ type: 'error', text: 'Please select an organism and antibiotic' });
+      return;
+    }
+    if (!isMicOnly && !currentResult.zone) {
+      setMessage({ type: 'error', text: 'Please enter a zone diameter' });
+      return;
+    }
+    if (['N/A', 'Invalid', '—', ''].includes(currentResult.interpretation)) {
+      setMessage({ type: 'error', text: 'This combination could not be interpreted — check the entry before saving' });
       return;
     }
 
@@ -43,7 +52,7 @@ const ASTEntry = () => {
     
     const resultData = {
       ...currentResult,
-      zone: parseFloat(currentResult.zone)
+      zone: currentResult.zone ? parseFloat(currentResult.zone) : null
     };
 
     const result = await saveResult(resultData);
@@ -91,13 +100,13 @@ const ASTEntry = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Patient Information */}
           <div>
-            <label className="label-text">Patient ID *</label>
+            <label className="label-text">Patient ID (optional)</label>
             <input
               type="text"
               value={currentResult.patientId || ''}
               onChange={(e) => handleChange('patientId', e.target.value)}
               className="input-field"
-              placeholder="e.g., PT-001"
+              placeholder="e.g., an anonymized code — avoid real names"
             />
           </div>
           <div>
@@ -204,16 +213,16 @@ const ASTEntry = () => {
           </div>
 
           <div>
-            <label className="label-text">Zone Diameter (mm) *</label>
+            <label className="label-text">Zone Diameter (mm) {!isMicOnly && '*'}</label>
             <input
               type="number"
               value={currentResult.zone || ''}
               onChange={handleZoneChange}
               className="input-field"
-              placeholder="e.g., 22"
+              placeholder={isMicOnly ? 'Not used — MIC method required' : 'e.g., 22'}
               step="0.1"
-              disabled={!currentResult.antibiotic}
-              required
+              disabled={!currentResult.antibiotic || isMicOnly}
+              required={!isMicOnly}
             />
           </div>
         </div>
@@ -224,6 +233,7 @@ const ASTEntry = () => {
             currentResult.color === 'green' ? 'bg-green-100 text-green-800 border border-green-200' :
             currentResult.color === 'red' ? 'bg-red-100 text-red-800 border border-red-200' :
             currentResult.color === 'yellow' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
+            currentResult.color === 'purple' ? 'bg-purple-100 text-purple-800 border border-purple-200' :
             'bg-gray-100 text-gray-800 border border-gray-200'
           }`}>
             <p>

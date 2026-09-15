@@ -4,12 +4,13 @@ import { useIndexedDB } from '../hooks/useIndexedDB';
 import { exportToCSV } from '../utils/exportHelpers';
 
 const HistoryTable = () => {
-  const { results, setResults, searchQuery } = useASTStore();
-  const { getResults, countByInterpretation } = useIndexedDB();
+  const { results, setResults, searchQuery, resetLocalState } = useASTStore();
+  const { getResults, countByInterpretation, clearAllData } = useIndexedDB();
   const [filteredResults, setFilteredResults] = useState([]);
   const [filterOrganism, setFilterOrganism] = useState('');
   const [filterAntibiotic, setFilterAntibiotic] = useState('');
   const [filterInterpretation, setFilterInterpretation] = useState('');
+  const [isClearing, setIsClearing] = useState(false);
 
   useEffect(() => {
     loadResults();
@@ -73,6 +74,24 @@ const HistoryTable = () => {
     exportToCSV(filteredResults);
   };
 
+  const handleClearAllData = async () => {
+    if (results.length === 0) return;
+    const confirmed = window.confirm(
+      '⚠️ This permanently deletes ALL saved results, QC logs, and patient records from this browser. This cannot be undone. Continue?'
+    );
+    if (!confirmed) return;
+
+    setIsClearing(true);
+    const outcome = await clearAllData();
+    if (outcome.success) {
+      resetLocalState();
+      setFilteredResults([]);
+    } else {
+      alert('Failed to clear data. Please try again.');
+    }
+    setIsClearing(false);
+  };
+
   // Get unique values for filters
   const organisms = [...new Set(results.map(r => r.organism).filter(Boolean))];
   const antibiotics = [...new Set(results.map(r => r.antibiotic).filter(Boolean))];
@@ -87,6 +106,14 @@ const HistoryTable = () => {
           </button>
           <button onClick={handleExport} className="btn-primary text-sm">
              Export CSV
+          </button>
+          <button
+            onClick={handleClearAllData}
+            className="btn-danger text-sm"
+            disabled={isClearing || results.length === 0}
+            title="Permanently delete all saved data from this browser"
+          >
+            {isClearing ? 'Clearing…' : '🗑️ Clear All Data'}
           </button>
         </div>
       </div>

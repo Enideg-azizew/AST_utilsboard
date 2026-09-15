@@ -1,8 +1,25 @@
-import { breakpoints, clinicalNotes, qcRanges } from './breakpoints';
+import { breakpoints, clinicalNotes, qcRanges, micOnlyCombos } from './breakpoints';
 
 // Interpret zone diameter for a given organism and antibiotic
 export const interpretZone = (organism, antibiotic, zone) => {
-  if (!organism || !antibiotic || zone === undefined || zone === null || zone === '') {
+  if (!organism || !antibiotic) {
+    return { interpretation: '—', color: 'gray', note: 'Select an organism and antibiotic' };
+  }
+
+  // Some combinations are not reliably interpretable by disk diffusion at all —
+  // flag this before requiring a zone diameter, since one isn't clinically meaningful here.
+  if (micOnlyCombos[organism]?.includes(antibiotic)) {
+    const extra = organism === 'Enterococcus faecalis' && antibiotic === 'Vancomycin'
+      ? ` If MIC testing confirms resistance: ${clinicalNotes.VRE}`
+      : '';
+    return {
+      interpretation: 'MIC',
+      color: 'purple',
+      note: 'Disk diffusion is not reliable for this combination per CLSI — use an MIC method (broth microdilution or gradient diffusion) instead.' + extra
+    };
+  }
+
+  if (zone === undefined || zone === null || zone === '') {
     return { interpretation: '—', color: 'gray', note: 'Please enter a zone diameter' };
   }
 
@@ -30,6 +47,8 @@ export const interpretZone = (organism, antibiotic, zone) => {
       note = clinicalNotes.MRSA;
     } else if (antibiotic === 'Meropenem' && ['E. coli', 'Klebsiella pneumoniae'].includes(organism)) {
       note = clinicalNotes.CRE;
+    } else if (antibiotic === 'Ceftriaxone' && ['E. coli', 'Klebsiella pneumoniae'].includes(organism)) {
+      note = clinicalNotes.ESBL;
     } else {
       note = clinicalNotes.default;
     }

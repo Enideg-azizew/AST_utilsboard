@@ -20,6 +20,8 @@ const Antibiogram = () => {
     setIsLoading(false);
   };
 
+  const MIN_RELIABLE_N = 30; // CLSI M39 guidance: interpret antibiograms below this cautiously
+
   const getColorForPercentage = (pct) => {
     if (pct >= 80) return 'bg-green-600 text-white';
     if (pct >= 60) return 'bg-yellow-500 text-white';
@@ -83,6 +85,7 @@ const Antibiogram = () => {
         <span className="inline-flex items-center gap-1"><span className="w-4 h-4 bg-yellow-500 rounded"></span> 60-79% (Moderate)</span>
         <span className="inline-flex items-center gap-1"><span className="w-4 h-4 bg-orange-500 rounded"></span> 40-59% (Low)</span>
         <span className="inline-flex items-center gap-1"><span className="w-4 h-4 bg-red-600 rounded"></span> {'<40%'} (Critical)</span>
+        <span className="inline-flex items-center gap-1 text-amber-600">⚠️ n &lt; {MIN_RELIABLE_N} isolates — interpret with caution</span>
       </div>
 
       {/* Table */}
@@ -100,19 +103,29 @@ const Antibiogram = () => {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organism</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Antibiotic</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% Susceptible</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">n</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {Object.entries(data)
                 .sort((a, b) => a[0].localeCompare(b[0]))
-                .map(([key, percentage]) => {
+                .map(([key, { percentage, total }]) => {
                   const [organism, antibiotic] = key.split('_');
+                  const lowN = total < MIN_RELIABLE_N;
                   return (
                     <tr key={key} className="hover:bg-gray-50">
                       <td className="px-4 py-3 text-sm text-gray-900">{organism}</td>
                       <td className="px-4 py-3 text-sm text-gray-900">{antibiotic}</td>
                       <td className="px-4 py-3 text-sm font-bold">{percentage}%</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {total}
+                        {lowN && (
+                          <span className="ml-1 text-amber-600" title={`Fewer than ${MIN_RELIABLE_N} isolates — interpret with caution (CLSI M39)`}>
+                            ⚠️
+                          </span>
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-sm">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${getColorForPercentage(percentage)}`}>
                           {percentage >= 80 ? ' Good' :

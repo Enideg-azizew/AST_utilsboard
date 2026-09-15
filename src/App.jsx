@@ -9,6 +9,7 @@ import { useASTStore } from './store/astStore';
 import { useIndexedDB } from './hooks/useIndexedDB';
 import ResistanceChart from './components/ResistanceChart'; 
 import PortfolioFooter from './components/PortfolioFooter'; 
+import { breakpointsMeta } from './utils/breakpoints';
 
 function App() {
   const [activeTab, setActiveTab] = useState('entry');
@@ -46,7 +47,13 @@ const applyFilters = async () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
- 
+
+      <div className="bg-amber-50 border-b border-amber-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 text-xs text-amber-800">
+          ⚠️ Educational/reference tool only — not for clinical decision-making. Breakpoints: {breakpointsMeta.source}.
+        </div>
+      </div>
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
  {/* Add this block right after the main opening tag and before Stats */}
 {activeTab !== 'entry' && (

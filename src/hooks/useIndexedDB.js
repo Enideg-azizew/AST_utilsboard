@@ -133,10 +133,14 @@ const getAllPatients = async () => {
         }
       });
       
-      // Calculate percentages
+      // Calculate percentages — keep the sample size alongside it so callers can
+      // flag low-n combinations (CLSI M39 suggests suppressing counts below ~30 isolates)
       const result = {};
       for (const [key, data] of Object.entries(grouped)) {
-        result[key] = Math.round((data.susceptible / data.total) * 100);
+        result[key] = {
+          percentage: Math.round((data.susceptible / data.total) * 100),
+          total: data.total
+        };
       }
       
       return result;
@@ -171,10 +175,22 @@ const getAllPatients = async () => {
     }
   };
 
-  // Delete all results (for testing)
+  // Delete all results only (for testing)
   const clearAllResults = async () => {
     try {
       await db.results.clear();
+      return { success: true };
+    } catch (err) {
+      setError(err);
+      return { success: false, error: err };
+    }
+  };
+
+  // Delete everything — results, QC logs, and stored patient records.
+  // This is the one actually wired to the "Clear All Data" button in the UI.
+  const clearAllData = async () => {
+    try {
+      await Promise.all([db.results.clear(), db.qcLogs.clear(), db.patients.clear()]);
       return { success: true };
     } catch (err) {
       setError(err);
@@ -273,6 +289,7 @@ const getResistanceTrends = async (organism = null, antibiotic = null, months = 
     saveQCLog,
     getQCLogs,
     clearAllResults,
+    clearAllData,
     countResults,
     countByInterpretation,
 savePatient,      

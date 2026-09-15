@@ -1,5 +1,21 @@
-// CLSI 2024 breakpoints for common organisms and antibiotics (disk diffusion)
-// Values are zone diameter breakpoints in mm
+// Zone diameter breakpoints (disk diffusion), referenced from CLSI M100, 33rd Edition (2023).
+// This is a small reference subset for demonstration only — it has not been independently
+// re-verified against the published tables and MUST be checked against the current CLSI
+// M100 (or EUCAST) document before any real interpretive use.
+export const breakpointsMeta = {
+  source: 'CLSI M100, 33rd Edition (2023) — reference subset, not independently re-verified',
+  lastReviewed: '2024-01-15',
+  disclaimer:
+    'For educational / reference use only. Not a substitute for the current published ' +
+    'CLSI or EUCAST breakpoint tables, and not intended to guide real patient care.'
+};
+
+// Organism/antibiotic combinations where disk diffusion is not considered reliable and
+// CLSI recommends an MIC method (broth microdilution or gradient diffusion) instead.
+export const micOnlyCombos = {
+  'Staphylococcus aureus': ['Vancomycin'],
+  'Enterococcus faecalis': ['Vancomycin']
+};
 
 export const breakpoints = {
   'E. coli': {
@@ -31,14 +47,14 @@ export const breakpoints = {
     'Penicillin': { S: 29, R: 28 },
     'Ciprofloxacin': { S: 21, R: 15 },
     'Gentamicin': { S: 15, R: 12 },
-    'Vancomycin': { S: 15, R: 14 },
     'Trimethoprim-Sulfamethoxazole': { S: 16, R: 10 }
+    // Vancomycin intentionally excluded — see micOnlyCombos (MIC method required)
   },
   'Enterococcus faecalis': {
     'Ampicillin': { S: 17, R: 13 },
     'Gentamicin': { S: 15, R: 12 },
-    'Vancomycin': { S: 17, R: 14 },
     'Linezolid': { S: 21, R: 19 }
+    // Vancomycin intentionally excluded — see micOnlyCombos (MIC method required)
   },
   'Streptococcus pneumoniae': {
     'Penicillin': { S: 19, R: 18 },
@@ -82,9 +98,12 @@ export const clinicalNotes = {
 // Get available organisms
 export const getOrganisms = () => Object.keys(breakpoints);
 
-// Get available antibiotics for a specific organism
+// Get available antibiotics for a specific organism (includes MIC-only combos,
+// which are still selectable but interpreted differently — see interpreter.js)
 export const getAntibiotics = (organism) => {
-  return breakpoints[organism] ? Object.keys(breakpoints[organism]) : [];
+  const diskDiffusion = breakpoints[organism] ? Object.keys(breakpoints[organism]) : [];
+  const micOnly = micOnlyCombos[organism] || [];
+  return [...new Set([...diskDiffusion, ...micOnly])].sort();
 };
 
 // Get QC organisms

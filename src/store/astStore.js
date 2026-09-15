@@ -27,12 +27,13 @@ export const useASTStore = create((set, get) => ({
     set((state) => {
       const newResult = { ...state.currentResult, [field]: value };
       
-      // Auto-interpret if organism, antibiotic, and zone are present
-      if (newResult.organism && newResult.antibiotic && newResult.zone) {
+      // Auto-interpret once organism + antibiotic are chosen. interpretZone handles a
+      // missing zone itself (some combos, like MIC-only ones, don't need one at all).
+      if (newResult.organism && newResult.antibiotic) {
         const interpretation = interpretZone(
           newResult.organism,
           newResult.antibiotic,
-          parseFloat(newResult.zone)
+          newResult.zone === '' ? '' : parseFloat(newResult.zone)
         );
         newResult.interpretation = interpretation.interpretation;
         newResult.note = interpretation.note;
@@ -73,11 +74,9 @@ export const useASTStore = create((set, get) => ({
     dateRange: { ...state.dateRange, [field]: value }
   }));
 },
-  clearAllData: () => {
-    if (confirm('⚠️ This will delete ALL saved results. Are you sure?')) {
-      set({ results: [], stats: { S: 0, I: 0, R: 0, total: 0 } });
-      return true;
-    }
-    return false;
+  // Resets in-memory state only — actually deleting stored data goes through
+  // useIndexedDB's clearAllData, which this is called alongside (see HistoryTable).
+  resetLocalState: () => {
+    set({ results: [], qcLogs: [], stats: { S: 0, I: 0, R: 0, total: 0 } });
   }
 }));
