@@ -55,7 +55,7 @@ const applyFilters = async () => {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
- {/* Add this block right after the main opening tag and before Stats */}
+ {/* filters */}
 {activeTab !== 'entry' && (
   <div className="mb-6 card">
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -110,7 +110,7 @@ const applyFilters = async () => {
         <div className="mb-6">
           <DashboardStats stats={stats} />
         </div>
-{/* Add this after DashboardStats component */}
+{/* resistance chart for both */}
 {(activeTab === 'history' || activeTab === 'antibiogram') && (
   <div className="mb-6">
     <ResistanceChart />

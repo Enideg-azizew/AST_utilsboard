@@ -77,7 +77,7 @@ const HistoryTable = () => {
   const handleClearAllData = async () => {
     if (results.length === 0) return;
     const confirmed = window.confirm(
-      '⚠️ This permanently deletes ALL saved results, QC logs, and patient records from this browser. This cannot be undone. Continue?'
+      ' This permanently deletes ALL saved results, QC logs, and patient records from this browser. This cannot be undone. Continue?'
     );
     if (!confirmed) return;
 

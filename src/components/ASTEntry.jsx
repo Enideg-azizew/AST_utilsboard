@@ -250,7 +250,7 @@ const ASTEntry = () => {
           className="btn-primary w-full py-3 text-lg"
           disabled={isSaving}
         >
-          {isSaving ? 'Saving...' : '💾 Save Result'}
+          {isSaving ? 'Saving...' : 'Save Result'}
         </button>
       </form>
     </div>

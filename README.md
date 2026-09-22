@@ -54,7 +54,7 @@ MIT
 
 ## DEMO
 
-(link)  [https://ast-utilsboard.vercel.com]
+(link)[https://ast-utilsboard.vercel.com]
 
 ## CONTACT ME
 

@@ -1,4 +1,3 @@
-// src/components/ResistanceChart.jsx
 import React, { useEffect, useState } from 'react';
 import { useIndexedDB } from '../hooks/useIndexedDB';
 import { useASTStore } from '../store/astStore';

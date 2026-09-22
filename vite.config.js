@@ -29,10 +29,10 @@ export default defineConfig({
         // Limit cache size to prevent timeout
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
       },
-      // Optional: Disable PWA in development
+      // Optional: Disable PWA
       // devOptions: {
       //   enabled: false
-      // }
+      // } 
     })
   ],
   server: {

@@ -85,7 +85,7 @@ const Antibiogram = () => {
         <span className="inline-flex items-center gap-1"><span className="w-4 h-4 bg-yellow-500 rounded"></span> 60-79% (Moderate)</span>
         <span className="inline-flex items-center gap-1"><span className="w-4 h-4 bg-orange-500 rounded"></span> 40-59% (Low)</span>
         <span className="inline-flex items-center gap-1"><span className="w-4 h-4 bg-red-600 rounded"></span> {'<40%'} (Critical)</span>
-        <span className="inline-flex items-center gap-1 text-amber-600">⚠️ n &lt; {MIN_RELIABLE_N} isolates — interpret with caution</span>
+        <span className="inline-flex items-center gap-1 text-amber-600"> n &lt; {MIN_RELIABLE_N} isolates — interpret with caution</span>
       </div>
 
       {/* Table */}
@@ -122,7 +122,7 @@ const Antibiogram = () => {
                         {total}
                         {lowN && (
                           <span className="ml-1 text-amber-600" title={`Fewer than ${MIN_RELIABLE_N} isolates — interpret with caution (CLSI M39)`}>
-                            ⚠️
+                            
                           </span>
                         )}
                       </td>

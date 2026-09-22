@@ -1,5 +1,6 @@
 import React from 'react';
 
+/* Generated with Claude*/
 const PortfolioFooter = () => {
   const currentYear = new Date().getFullYear();
   

@@ -133,8 +133,7 @@ const getAllPatients = async () => {
         }
       });
       
-      // Calculate percentages — keep the sample size alongside it so callers can
-      // flag low-n combinations (CLSI M39 suggests suppressing counts below ~30 isolates)
+      // Calculate percentages — (CLSI M39 suggests suppressing counts below ~30 isolates)
       const result = {};
       for (const [key, data] of Object.entries(grouped)) {
         result[key] = {
@@ -187,7 +186,7 @@ const getAllPatients = async () => {
   };
 
   // Delete everything — results, QC logs, and stored patient records.
-  // This is the one actually wired to the "Clear All Data" button in the UI.
+  // 
   const clearAllData = async () => {
     try {
       await Promise.all([db.results.clear(), db.qcLogs.clear(), db.patients.clear()]);
